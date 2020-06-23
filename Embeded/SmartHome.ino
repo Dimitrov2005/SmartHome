@@ -12,6 +12,7 @@ float voltage;  //10'bit adc, 1023resolution, 3.3v
 char payload[300];
 int light_on;
 int heat_on;
+int cool_on; 
 
 int state;
 //5 - heat on, light off 
