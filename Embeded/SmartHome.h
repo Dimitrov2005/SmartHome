@@ -28,11 +28,12 @@ const uint8_t DHTPin = D5;
 //Relays 
 const uint8_t LAMP_RELAY = D8;
 const uint8_t HEAT_RELAY = D7;
-
+const uint8_t COOL_RELAY = D6;
 
 // MQTT topics where sensor data should be published to:
 const char* device_name = "nodemcu_sensor";
 const char* sensor_topic = "nodemcu_sensor/measurements";
 
-const char* builtin_light_topic = "nodemcu_sensor/light";
-const char* builtin_heat_topic = "nodemcu_sensor/heat";
+const char* builtin_light_topic = "nodemcu_actuator/lights";
+const char* builtin_heat_topic = "nodemcu_actuator/heat";
+const char* builtin_cool_topic = "nodemcu_actuator/cool";

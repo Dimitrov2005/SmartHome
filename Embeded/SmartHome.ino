@@ -10,6 +10,14 @@ DHT dht(DHTPin, DHTTYPE);   // Initialize DHT sensor object with pin and DHT mod
 int sensorValueFromAdc; 
 float voltage;  //10'bit adc, 1023resolution, 3.3v
 char payload[300];
+int light_on;
+int heat_on;
+
+int state;
+//5 - heat on, light off 
+//6 - heat off, light on
+//7 - heat on, light on 
+//8 - heat off, light off  
 
 void setup() {
   // Temp&Hum Sensor Setup:
@@ -22,14 +30,15 @@ void setup() {
   setup_wifi();
   mqttClient.setServer(mqtt_server_address, mqtt_server_port);
   mqttClient.setCallback(callback);
-}
-
-void loop() {
 
   // Ensure MQTT client is connected to the MQTT broker:
   if (!mqttClient.connected()) {
     reconnect();
   }
+  
+}
+
+void loop() {
   mqttClient.loop();
 
   // Construct JSON payload with sensor readings data:
@@ -91,23 +100,34 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
   Serial.println();
   if (strcmp(topic, builtin_light_topic) == 0) {
-    if (content_string->startsWith("LIGHT_ON")) {
+    if (content_string->startsWith("LIGHT_ON") && !light_on) {
       digitalWrite(LAMP_RELAY, ON);   // Turn the LED on (Note that LOW is the voltage level
-      // but actually the LED is on; this is because
-      // it is active low on the ESP-01)
+      light_on = 1; 
     }
-    if (content_string->startsWith("LIGHT_OFF")) {
+    if (content_string->startsWith("LIGHT_OFF") && light_on) {
       digitalWrite(LAMP_RELAY, OFF);  // Turn the LED off by making the voltage HIGH
+      light_on = 0;
     }
   }
   else if (strcmp(topic, builtin_heat_topic) == 0) {
-    if (content_string->startsWith("HEAT_ON")) {
+    if (content_string->startsWith("HEAT_ON") && !heat_on) {
       digitalWrite(HEAT_RELAY, ON);   // Turn the LED on (Note that LOW is the voltage level
-      // but actually the LED is on; this is because
-      // it is active low on the ESP-01)
+      heat_on = 1;
     }
-    if (content_string->startsWith("HEAT_OFF")) {
+    if (content_string->startsWith("HEAT_OFF") && heat_on) {
       digitalWrite(HEAT_RELAY, OFF);  // Turn the LED off by making the voltage HIGH
+      heat_on = 0; 
+    }
+  }
+  
+  else if (strcmp(topic, builtin_cool_topic) == 0) {
+    if (content_string->startsWith("COOL_ON") && !cool_on) {
+      digitalWrite(COOL_RELAY, ON);   
+      cool_on = 1;
+    }
+    if (content_string->startsWith("COOL_OFF") && cool_on) {
+      digitalWrite(COOL_RELAY, OFF);  
+      cool_on = 0; 
     }
   }
 
